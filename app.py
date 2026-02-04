@@ -25,8 +25,7 @@ def call_web_fonts_api(font_query):
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         a = response.json()
-        print(a)
-        list_a = [a["items"][0]["files"]["regular"]]
+        list_a = [f"{a["items"][0]["files"]["regular"]}"]
         return list_a
     else:
         url = "https://webfonts.googleapis.com/v1/webfonts"
@@ -44,10 +43,10 @@ def call_web_fonts_api(font_query):
         if len(a["items"]) == 2:
             first_response = a["items"][0]["files"]["regular"]
             second_response = a["items"][1]["files"]["regular"]
-            return [first_response, second_response]
+            return [f"{first_response}", f"{second_response}"]
         else:
             first_response = a["items"][0]["files"]["regular"]
-            return first_response
+            return [f"{first_response}"]
 
 
 def convert_ttf_to_image(ttf_url, identifier):
