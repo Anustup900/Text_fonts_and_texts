@@ -5,6 +5,7 @@ import urllib.request
 import os
 import replicate
 import fal_client
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 os.environ["REPLICATE_API_TOKEN"] = st.secrets["REPLICATE_API_TOKEN"]
 os.environ["FAL_KEY"] = st.secrets["FAL_KEY"]
@@ -88,7 +89,7 @@ def run_replicate(user_prompt, selected_aspect_ratio, number_of_query, text_of_f
             input_data = {
                 "resolution": "1K",
                 "instruction": user_prompt,
-                "init_images" : [],
+                "init_images": [],
                 "aspect_ratio": selected_aspect_ratio,
                 "enhance_prompt": False,
                 "font_urls": [result_from_web_font_api[0], result_from_web_font_api[1]],
@@ -161,13 +162,13 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
                     "prompt": user_prompt_m,
-                    "image_urls": [first_image_url, second_image_url]
+                    "image_urls": [first_image_url, second_image_url],
+                    "aspect_ratio": selected_aspect_ratio,
+                    "output_format": "png",
+                    "resolution": "1K"
                 },
                 with_logs=False,
-                on_queue_update=on_queue_update,
-                aspect_ratio=selected_aspect_ratio,
-                output_format="png",
-                resolution="1K")
+                on_queue_update=on_queue_update,)
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
             urllib.request.urlretrieve(final_image, nb_output_path)
@@ -185,13 +186,14 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
                     "prompt": user_prompt_m,
-                    "image_urls": [first_image_url]
+                    "image_urls": [first_image_url],
+                    "aspect_ratio": selected_aspect_ratio,
+                    "output_format": "png",
+                    "resolution": "1K",
                 },
-                with_logs=False,
-                on_queue_update=on_queue_update,
-                aspect_ratio=selected_aspect_ratio,
-                output_format="png",
-                resolution="1K")
+            with_logs = False,
+            on_queue_update = on_queue_update,
+            )
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
             urllib.request.urlretrieve(final_image, nb_output_path)
@@ -210,13 +212,14 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
             "fal-ai/nano-banana-pro/edit",
             arguments={
                 "prompt": user_prompt_m,
-                "image_urls": [first_image_url]
+                "image_urls": [first_image_url],
+                "aspect_ratio": selected_aspect_ratio,
+                "output_format": "png",
+                "resolution": "1K"
             },
             with_logs=False,
             on_queue_update=on_queue_update,
-            aspect_ratio=selected_aspect_ratio,
-            output_format="png",
-            resolution="1K")
+            )
         final_image = result["images"][0]["url"]
         nb_output_path = "NB.png"
         urllib.request.urlretrieve(final_image, nb_output_path)
@@ -241,8 +244,32 @@ with st.sidebar:
 if run:
     text_of_font = [text_font_one, text_font_second]
     font_query = [font_name_first, font_name_second]
-    img1 = run_replicate(prompt, aspect_ratio, number_of_fonts, text_of_font, font_query)
-    img2 = call_nano_banana(prompt, aspect_ratio, number_of_fonts, text_of_font, font_query)
+
+    # Display a progress indicator
+    with st.spinner("Generating images in parallel..."):
+        # Execute both API calls in parallel using ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Submit both tasks
+            future_replicate = executor.submit(
+                run_replicate,
+                prompt,
+                aspect_ratio,
+                number_of_fonts,
+                text_of_font,
+                font_query
+            )
+            future_nano_banana = executor.submit(
+                call_nano_banana,
+                prompt,
+                aspect_ratio,
+                number_of_fonts,
+                text_of_font,
+                font_query
+            )
+
+            # Wait for both to complete and get results
+            img1 = future_replicate.result()
+            img2 = future_nano_banana.result()
 
     if img1["both_fonts_correct"]:
         col1, col2 = st.columns(2)
@@ -259,4 +286,3 @@ if run:
                      caption="RiverFlow 2.0 Image", use_container_width=True)
         with col2:
             st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
-
