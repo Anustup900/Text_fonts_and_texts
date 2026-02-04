@@ -162,13 +162,10 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
                     "prompt": str(user_prompt_m),
-                    "image_urls": [first_image_url, second_image_url],
-                    "aspect_ratio": selected_aspect_ratio,
-                    "output_format": "png",
-                    "resolution": "1K"
+                    "image_urls": [first_image_url, second_image_url]
                 },
                 with_logs=False,
-                on_queue_update=on_queue_update, )
+                on_queue_update=on_queue_update)
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
             urllib.request.urlretrieve(final_image, nb_output_path)
@@ -186,14 +183,10 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
                     "prompt": str(user_prompt_m),
-                    "image_urls": [first_image_url],
-                    "aspect_ratio": selected_aspect_ratio,
-                    "output_format": "png",
-                    "resolution": "1K",
+                    "image_urls": [first_image_url]
                 },
                 with_logs=False,
-                on_queue_update=on_queue_update,
-            )
+                on_queue_update=on_queue_update)
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
             urllib.request.urlretrieve(final_image, nb_output_path)
@@ -212,14 +205,10 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
             "fal-ai/nano-banana-pro/edit",
             arguments={
                 "prompt": str(user_prompt_m),
-                "image_urls": [first_image_url],
-                "aspect_ratio": selected_aspect_ratio,
-                "output_format": "png",
-                "resolution": "1K"
+                "image_urls": [first_image_url]
             },
             with_logs=False,
-            on_queue_update=on_queue_update,
-        )
+            on_queue_update=on_queue_update)
         final_image = result["images"][0]["url"]
         nb_output_path = "NB.png"
         urllib.request.urlretrieve(final_image, nb_output_path)
