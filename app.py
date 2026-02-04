@@ -151,8 +151,8 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
         if len(result_from_web_font_api) == 2:
             user_prompt_m = {
                 "instruction": user_prompt,
-                "fonts_and_text_instruction": f"For {text_of_font[0]} use font from Image 1 and "
-                                              f"for {text_of_font[1]} use font from Image 2"
+                "fonts_and_text_instruction": f"Use Image_1 font For {text_of_font[0]} and "
+                                              f"use Image_2 font For {text_of_font[1]}."
             }
             first_image_png = convert_ttf_to_image(result_from_web_font_api[0], "first")
             first_image_url = fal_client.upload_file(first_image_png)
