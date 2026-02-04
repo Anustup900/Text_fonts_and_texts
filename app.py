@@ -161,7 +161,7 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
             result = fal_client.subscribe(
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
-                    "prompt": user_prompt_m,
+                    "prompt": str(user_prompt_m),
                     "image_urls": [first_image_url, second_image_url],
                     "aspect_ratio": selected_aspect_ratio,
                     "output_format": "png",
@@ -185,7 +185,7 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
             result = fal_client.subscribe(
                 "fal-ai/nano-banana-pro/edit",
                 arguments={
-                    "prompt": user_prompt_m,
+                    "prompt": str(user_prompt_m),
                     "image_urls": [first_image_url],
                     "aspect_ratio": selected_aspect_ratio,
                     "output_format": "png",
@@ -211,7 +211,7 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
         result = fal_client.subscribe(
             "fal-ai/nano-banana-pro/edit",
             arguments={
-                "prompt": user_prompt_m,
+                "prompt": str(user_prompt_m),
                 "image_urls": [first_image_url],
                 "aspect_ratio": selected_aspect_ratio,
                 "output_format": "png",
