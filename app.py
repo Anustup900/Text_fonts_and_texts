@@ -12,7 +12,7 @@ API_KEY = st.secrets["google_api_key"]
 
 
 def call_web_fonts_api(font_query):
-    if len(font_query["items"]) == 1:
+    if len(font_query) == 1:
         url = "https://webfonts.googleapis.com/v1/webfonts"
         params = {
             "family": font_query[0],
@@ -40,7 +40,7 @@ def call_web_fonts_api(font_query):
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         a = response.json()
-        if len(a) == 2:
+        if len(a["items"]) == 2:
             first_response = a["items"][0]["files"]["regular"]
             second_response = a["items"][1]["files"]["regular"]
             return [first_response, second_response]
