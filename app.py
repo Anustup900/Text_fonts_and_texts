@@ -64,7 +64,7 @@ def convert_ttf_to_image(ttf_url, identifier):
 
     """
     FONT_SIZE = 80
-    IMG_SIZE = (800, 300)
+    IMG_SIZE = (1024, 1024)
     BG_COLOR = (255, 255, 255)
     TEXT_COLOR = (0, 0, 0)
     urllib.request.urlretrieve(ttf_url, FONT_PATH)
