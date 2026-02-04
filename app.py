@@ -248,14 +248,14 @@ if run:
         # Execute both API calls in parallel using ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=2) as executor:
             # Submit both tasks
-            future_replicate = executor.submit(
-                run_replicate,
-                prompt,
-                aspect_ratio,
-                number_of_fonts,
-                text_of_font,
-                font_query
-            )
+            # future_replicate = executor.submit(
+            #     run_replicate,
+            #     prompt,
+            #     aspect_ratio,
+            #     number_of_fonts,
+            #     text_of_font,
+            #     font_query
+            # )
             future_nano_banana = executor.submit(
                 call_nano_banana,
                 prompt,
@@ -266,21 +266,11 @@ if run:
             )
 
             # Wait for both to complete and get results
-            img1 = future_replicate.result()
+            #img1 = future_replicate.result()
             img2 = future_nano_banana.result()
 
-    if img1["both_fonts_correct"]:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(img1["output_image_path"],
-                     caption="RiverFlow 2.0 Image", use_container_width=True)
-        with col2:
-            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
+    if img2["both_fonts_correct"]:
+        st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
     else:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.text(img1["message"])
-            st.image(img1["output_image_path"],
-                     caption="RiverFlow 2.0 Image", use_container_width=True)
-        with col2:
-            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
+        st.text(img2["message"])
+        st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
