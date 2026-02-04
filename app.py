@@ -12,7 +12,7 @@ API_KEY = st.secrets["google_api_key"]
 
 
 def call_web_fonts_api(font_query):
-    if len(font_query) == 1:
+    if len(font_query["items"]) == 1:
         url = "https://webfonts.googleapis.com/v1/webfonts"
         params = {
             "family": font_query[0],
@@ -242,10 +242,19 @@ if run:
     img1 = run_replicate(prompt, aspect_ratio, number_of_fonts, text_of_font, font_query)
     img2 = call_nano_banana(prompt, aspect_ratio, number_of_fonts, text_of_font, font_query)
 
-    col1, col2 = st.columns(2)
+    if img1["both_fonts_correct"]:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(img1["output_image_path"],
+                     caption="RiverFlow 2.0 Image", use_container_width=True)
+        with col2:
+            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.text(img1["message"])
+            st.image(img1["output_image_path"],
+                     caption="RiverFlow 2.0 Image", use_container_width=True)
+        with col2:
+            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
 
-    with col1:
-        st.image(img1, caption="RiverFlow 2.0 Image", use_container_width=True)
-
-    with col2:
-        st.image(img2, caption="Caimera NB Agent", use_container_width=True)
