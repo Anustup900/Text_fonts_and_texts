@@ -88,6 +88,7 @@ def run_replicate(user_prompt, selected_aspect_ratio, number_of_query, text_of_f
             input_data = {
                 "resolution": "1K",
                 "instruction": user_prompt,
+                "init_images" : [],
                 "aspect_ratio": selected_aspect_ratio,
                 "enhance_prompt": False,
                 "font_urls": [result_from_web_font_api[0], result_from_web_font_api[1]],
