@@ -228,7 +228,7 @@ st.title("RiverFlow Vs Caimera NB Agent")
 with st.sidebar:
     st.header("Inputs")
     prompt = st.text_area("Prompt", height=120)
-    number_of_fonts = st.number_input("Input number of fonts (max 2)")
+    number_of_fonts = int(st.number_input("Input number of fonts (max 2)"))
     font_name_first = st.text_input("Font 01 (name)")
     font_name_second = st.text_input("Font 02 (name)")
     text_font_one = st.text_area("Text for font 01", height=80)
