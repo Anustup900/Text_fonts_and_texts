@@ -25,6 +25,7 @@ def call_web_fonts_api(font_query):
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()
         a = response.json()
+        print(a)
         list_a = [a["items"][0]["files"]["regular"]]
         return list_a
     else:
@@ -96,6 +97,7 @@ def run_replicate(user_prompt, selected_aspect_ratio, number_of_query, text_of_f
                 "font_texts": [text_of_font[0], text_of_font[1]]
             }
             image_riverflow = replicate.run("sourceful/riverflow-2.0-pro", input=input_data)
+            print(image_riverflow)
             out_path = "river_flow.png"
             for item in image_riverflow:
                 with open(out_path, "wb") as file:
