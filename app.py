@@ -168,7 +168,7 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                     "resolution": "1K"
                 },
                 with_logs=False,
-                on_queue_update=on_queue_update,)
+                on_queue_update=on_queue_update, )
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
             urllib.request.urlretrieve(final_image, nb_output_path)
@@ -191,8 +191,8 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
                     "output_format": "png",
                     "resolution": "1K",
                 },
-            with_logs = False,
-            on_queue_update = on_queue_update,
+                with_logs=False,
+                on_queue_update=on_queue_update,
             )
             final_image = result["images"][0]["url"]
             nb_output_path = "NB.png"
@@ -219,7 +219,7 @@ def call_nano_banana(user_prompt, selected_aspect_ratio, number_of_query, text_o
             },
             with_logs=False,
             on_queue_update=on_queue_update,
-            )
+        )
         final_image = result["images"][0]["url"]
         nb_output_path = "NB.png"
         urllib.request.urlretrieve(final_image, nb_output_path)
@@ -245,44 +245,78 @@ if run:
     text_of_font = [text_font_one, text_font_second]
     font_query = [font_name_first, font_name_second]
 
-    # Display a progress indicator
-    with st.spinner("Generating images in parallel..."):
-        # Execute both API calls in parallel using ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            # Submit both tasks
-            future_replicate = executor.submit(
-                run_replicate,
-                prompt,
-                aspect_ratio,
-                number_of_fonts,
-                text_of_font,
-                font_query
-            )
-            future_nano_banana = executor.submit(
-                call_nano_banana,
-                prompt,
-                aspect_ratio,
-                number_of_fonts,
-                text_of_font,
-                font_query
-            )
+    # Create columns for side-by-side display
+    col1, col2 = st.columns(2)
 
-            # Wait for both to complete and get results
-            img1 = future_replicate.result()
-            img2 = future_nano_banana.result()
+    # Create placeholders for dynamic updates
+    with col1:
+        placeholder_replicate = st.empty()
+        image_replicate = st.empty()
+    with col2:
+        placeholder_nano = st.empty()
+        image_nano = st.empty()
 
-    if img1["both_fonts_correct"]:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(img1["output_image_path"],
-                     caption="RiverFlow 2.0 Image", use_container_width=True)
-        with col2:
-            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
-    else:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.text(img1["message"])
-            st.image(img1["output_image_path"],
-                     caption="RiverFlow 2.0 Image", use_container_width=True)
-        with col2:
-            st.image(img2["output_image_path"], caption="Caimera NB Agent", use_container_width=True)
+    # Show initial loading state
+    placeholder_replicate.info("🔄 RiverFlow 2.0 - Generating...")
+    placeholder_nano.info("🔄 Caimera NB Agent - Generating...")
+
+    # Store results
+    img1 = None
+    img2 = None
+
+    # Execute both API calls in parallel using ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit both tasks
+        future_replicate = executor.submit(
+            run_replicate,
+            prompt,
+            aspect_ratio,
+            number_of_fonts,
+            text_of_font,
+            font_query
+        )
+        future_nano_banana = executor.submit(
+            call_nano_banana,
+            prompt,
+            aspect_ratio,
+            number_of_fonts,
+            text_of_font,
+            font_query
+        )
+
+        # Create a dictionary to track futures
+        futures = {
+            future_replicate: ('replicate', placeholder_replicate, image_replicate),
+            future_nano_banana: ('nano', placeholder_nano, image_nano)
+        }
+
+        # Process results as they complete
+        for future in as_completed(futures):
+            api_name, placeholder, image_placeholder = futures[future]
+
+            try:
+                result = future.result()
+
+                if api_name == 'replicate':
+                    img1 = result
+                    placeholder.success("✅ RiverFlow 2.0 - Complete!")
+                    if not result["both_fonts_correct"]:
+                        image_placeholder.text(result["message"])
+                    image_placeholder.image(
+                        result["output_image_path"],
+                        caption="RiverFlow 2.0 Image",
+                        use_container_width=True
+                    )
+                else:  # nano
+                    img2 = result
+                    placeholder.success("✅ Caimera NB Agent - Complete!")
+                    image_placeholder.image(
+                        result["output_image_path"],
+                        caption="Caimera NB Agent",
+                        use_container_width=True
+                    )
+            except Exception as e:
+                if api_name == 'replicate':
+                    placeholder.error(f"❌ RiverFlow 2.0 - Error: {str(e)}")
+                else:
+                    placeholder.error(f"❌ Caimera NB Agent - Error: {str(e)}")
